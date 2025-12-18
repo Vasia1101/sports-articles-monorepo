@@ -9,3 +9,15 @@ export const ARTICLES = gql`
     }
   }
 `;
+
+export const ARTICLE = gql`
+  query Article($id: ID!) {
+    article(id: $id) {
+      id
+      title
+      content
+      createdAt
+      imageUrl
+    }
+  }
+`;

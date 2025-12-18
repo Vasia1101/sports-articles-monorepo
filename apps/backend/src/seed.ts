@@ -23,7 +23,7 @@ async function seed() {
     ]
   });
 
-  console.log("✅ Seeded articles");
+  console.log("Seeded articles");
 }
 
 seed()

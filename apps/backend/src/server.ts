@@ -1,7 +1,6 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import bodyParser from "body-parser";
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@as-integrations/express5";
 
@@ -12,7 +11,8 @@ async function main() {
   const app = express();
 
   app.use(cors({ origin: true, credentials: true }));
-  app.use(bodyParser.json());
+  app.use(express.json());
+
 
   const server = new ApolloServer({ typeDefs, resolvers });
   await server.start();
@@ -21,7 +21,7 @@ async function main() {
 
   const port = Number(process.env.PORT ?? 4000);
   app.listen(port, () => {
-    console.log(`🚀 Backend ready: http://localhost:${port}/graphql`);
+    console.log(`Backend ready: http://localhost:${port}/graphql`);
   });
 }
 

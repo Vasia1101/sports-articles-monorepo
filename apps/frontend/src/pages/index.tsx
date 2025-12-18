@@ -4,21 +4,11 @@ import { useQuery } from "@apollo/client/react";
 import { createApolloClient } from "@/lib/apollo";
 import { ARTICLES } from "@/graphql/queries";
 
-type Article = {
-  id: string;
-  title: string;
-  createdAt?: string | null;
-};
+import { Container, Stack, Typography, Button, Card, CardContent } from "@mui/material";
 
-type ArticlesQueryData = {
-  articles: Article[];
-};
-
-type ArticlesQueryVars = {
-  offset: number;
-  limit: number;
-};
-
+type Article = { id: string; title: string; createdAt?: string | null };
+type ArticlesQueryData = { articles: Article[] };
+type ArticlesQueryVars = { offset: number; limit: number };
 
 export default function Home(props: { initialData: ArticlesQueryData }) {
   const { data, loading, error } = useQuery<ArticlesQueryData, ArticlesQueryVars>(ARTICLES, {
@@ -28,39 +18,58 @@ export default function Home(props: { initialData: ArticlesQueryData }) {
 
   const items = data?.articles ?? props.initialData?.articles ?? [];
 
-  const formatDate = (v?: string) =>
-  v ? new Date(Number(v)).toLocaleDateString() : "";
-
+  const formatDate = (v?: string | null) => {
+    if (!v) return "";
+    const n = Number(v);
+    return Number.isFinite(n) ? new Date(n).toLocaleDateString() : v;
+  };
 
   return (
-    <main style={{ maxWidth: 900, margin: "40px auto", padding: 16 }}>
-      <header style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center" }}>
-        <h1 style={{ margin: 0 }}>Sports Articles</h1>
-        <Link href="/article/create">Create article</Link>
-      </header>
+    <Container maxWidth="md" sx={{ py: 5 }}>
+      <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2}>
+        <Typography variant="h4" fontWeight={800}>
+          Sports Articles
+        </Typography>
 
-      {error && <p style={{ color: "crimson" }}>Error: {error.message}</p>}
-      {loading && items.length === 0 && <p>Loading...</p>}
+        <Button component={Link} href="/article/create" variant="contained">
+          Create article
+        </Button>
+      </Stack>
 
-      <ul style={{ listStyle: "none", padding: 0, marginTop: 16 }}>
-        {items.map((a: any) => (
-          <li key={a.id} style={{ border: "1px solid #ddd", borderRadius: 12, padding: 12, marginBottom: 10 }}>
-            <Link href={`/article/${a.id}`} style={{ fontWeight: 700 }}>
-              {a.title}
-            </Link>
-            <div style={{ fontSize: 12, opacity: 0.7 }}>
-              {formatDate(a.createdAt)}
-            </div>
-          </li>
+      {error && (
+        <Typography color="error" sx={{ mt: 2 }}>
+          Error: {error.message}
+        </Typography>
+      )}
+
+      {loading && items.length === 0 && <Typography sx={{ mt: 2 }}>Loading...</Typography>}
+
+      <Stack spacing={2} sx={{ mt: 3 }}>
+        {items.map((a) => (
+          <Card key={a.id} variant="outlined">
+            <CardContent>
+              <Typography
+                component={Link}
+                href={`/article/${a.id}`}
+                variant="h6"
+                sx={{ textDecoration: "none" }}
+              >
+                {a.title}
+              </Typography>
+
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                {formatDate(a.createdAt)}
+              </Typography>
+            </CardContent>
+          </Card>
         ))}
-      </ul>
-    </main>
+      </Stack>
+    </Container>
   );
 }
 
 export const getServerSideProps: GetServerSideProps = async () => {
   const client = createApolloClient();
-
   const { data } = await client.query({
     query: ARTICLES,
     variables: { offset: 0, limit: 10 }
