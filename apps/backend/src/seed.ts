@@ -1,34 +1,54 @@
-import "dotenv/config";
+import fs from "node:fs";
+import path from "node:path";
+import { parse } from "csv-parse/sync";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-async function seed() {
-  await prisma.sportsArticle.deleteMany();
+async function main() {
+  const csvPath = path.join(process.cwd(), "prisma", "seed", "sports-articles.csv");
 
-  await prisma.sportsArticle.createMany({
-    data: [
-      {
-        title: "Champions League: Real Madrid secure victory",
-        content: "Real Madrid secured a dramatic win in the Champions League...",
-        createdAt: new Date("2024-05-01"),
-        imageUrl: "https://images.unsplash.com/photo-1517927033932-b3d18e61fb3a"
-      },
-      {
-        title: "NBA Playoffs: Lakers advance",
-        content: "The Los Angeles Lakers advanced after a thrilling series...",
-        createdAt: new Date("2024-05-02"),
-        imageUrl: "https://images.unsplash.com/photo-1517649763962-0c623066013b"
-      }
-    ]
+  const csv = fs.readFileSync(csvPath, "utf8");
+
+  const rows = parse(csv, {
+    columns: true,
+    skip_empty_lines: true,
+    trim: true
+  }) as Array<{
+    id: string;
+    title: string;
+    content: string;
+    createdAt: string;
+    imageUrl?: string;
+  }>;
+
+  const data = rows.map((row, i) => {
+    if (!row.title || !row.content) {
+      throw new Error(`Row ${i + 2}: title/content missing`);
+    }
+
+    return {
+      title: row.title.trim(),
+      content: row.content.trim(),
+      createdAt: new Date(row.createdAt), // YYYY-MM-DD format
+      imageUrl: row.imageUrl?.trim() || undefined
+    };
   });
 
-  console.log("Seeded articles");
+  await prisma.sportsArticle.deleteMany();
+
+  const res = await prisma.sportsArticle.createMany({
+    data
+  });
+
+  console.log(`✅ Seeded ${res.count} articles`);
 }
 
-seed()
+main()
   .catch((e) => {
-    console.error(e);
+    console.error("❌ Seed error:", e);
     process.exit(1);
   })
-  .finally(async () => prisma.$disconnect());
+  .finally(async () => {
+    await prisma.$disconnect();
+  });

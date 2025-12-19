@@ -30,6 +30,25 @@ export const resolvers = {
       return prisma.sportsArticle.findFirst({
         where: { id: args.id, deletedAt: null }
       });
+    },
+
+    articlesPage: async (_: unknown, args: { offset?: number; limit?: number }) => {
+      const offset = args.offset ?? 0;
+      const limit = args.limit ?? 10;
+
+      const where = { deletedAt: null as any };
+
+      const [items, totalCount] = await Promise.all([
+        prisma.sportsArticle.findMany({
+          where,
+          orderBy: { createdAt: "desc" },
+          skip: offset,
+          take: limit
+        }),
+        prisma.sportsArticle.count({ where })
+      ]);
+
+      return { items, totalCount };
     }
   },
 

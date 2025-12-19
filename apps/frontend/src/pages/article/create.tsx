@@ -2,7 +2,16 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useMutation } from "@apollo/client/react";
-import { Container, Stack, Typography, TextField, Button, Alert, Card, CardContent } from "@mui/material";
+import {
+  Container,
+  Stack,
+  Typography,
+  TextField,
+  Button,
+  Alert,
+  Card,
+  CardContent
+} from "@mui/material";
 import { CREATE_ARTICLE } from "@/graphql/mutations";
 
 type CreateInput = {
@@ -26,7 +35,15 @@ type CreateArticleVars = {
     imageUrl?: string;
   };
 };
-
+// move to helpers
+const isValidUrl = (value: string) => {
+  try {
+    new URL(value);
+    return true;
+  } catch {
+    return false;
+  }
+};
 
 export default function CreateArticlePage() {
   const router = useRouter();
@@ -35,7 +52,10 @@ export default function CreateArticlePage() {
   const [content, setContent] = useState("");
   const [imageUrl, setImageUrl] = useState("");
 
-  const [touched, setTouched] = useState<{ title: boolean; content: boolean }>({ title: false, content: false });
+  const [touched, setTouched] = useState<{ title: boolean; content: boolean }>({
+    title: false,
+    content: false
+  });
 
   const titleError = useMemo(() => {
     if (!touched.title) return "";
@@ -47,9 +67,22 @@ export default function CreateArticlePage() {
     return content.trim().length === 0 ? "Content is required" : "";
   }, [content, touched.content]);
 
-  const [createArticle, { loading, error }] = useMutation<CreateArticleResult, CreateArticleVars>(CREATE_ARTICLE);
+  const [createArticle, { loading, error }] = useMutation<CreateArticleResult, CreateArticleVars>(
+    CREATE_ARTICLE
+  );
 
-  const canSubmit = title.trim() && content.trim() && !titleError && !contentError;
+  const imageUrlError = useMemo(() => {
+    const v = imageUrl.trim();
+    if (!v) return "";
+    return isValidUrl(v) ? "" : "Invalid image URL";
+  }, [imageUrl]);
+
+  const canSubmit =
+    Boolean(title.trim()) &&
+    Boolean(content.trim()) &&
+    !titleError &&
+    !contentError &&
+    !imageUrlError;
 
   const onSubmit = async () => {
     setTouched({ title: true, content: true });
@@ -83,11 +116,7 @@ export default function CreateArticlePage() {
       <Card variant="outlined" sx={{ mt: 3 }}>
         <CardContent>
           <Stack spacing={2}>
-            {error && (
-              <Alert severity="error">
-                {error.message}
-              </Alert>
-            )}
+            {error && <Alert severity="error">{error.message}</Alert>}
 
             <TextField
               label="Title"
@@ -114,6 +143,8 @@ export default function CreateArticlePage() {
             <TextField
               label="Image URL (optional)"
               value={imageUrl}
+              error={Boolean(imageUrlError)}
+              helperText={imageUrlError || " "}
               onChange={(e) => setImageUrl(e.target.value)}
               fullWidth
             />

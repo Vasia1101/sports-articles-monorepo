@@ -10,9 +10,10 @@ import { resolvers } from "./resolvers";
 async function main() {
   const app = express();
 
-  app.use(cors({ origin: true, credentials: true }));
-  app.use(express.json());
+  const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN ?? "http://localhost:3000";
 
+  app.use(cors({ origin: FRONTEND_ORIGIN, credentials: true }));
+  app.use(express.json());
 
   const server = new ApolloServer({ typeDefs, resolvers });
   await server.start();

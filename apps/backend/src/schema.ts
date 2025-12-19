@@ -9,6 +9,10 @@ export const typeDefs = gql`
     deletedAt: String
     imageUrl: String
   }
+  type ArticlesPage {
+    items: [SportsArticle!]!
+    totalCount: Int!
+  }
 
   input ArticleInput {
     title: String!
@@ -18,6 +22,7 @@ export const typeDefs = gql`
 
   type Query {
     articles(offset: Int = 0, limit: Int = 10): [SportsArticle!]!
+    articlesPage(offset: Int = 0, limit: Int = 10): ArticlesPage!
     article(id: ID!): SportsArticle
   }
 

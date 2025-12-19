@@ -1,8 +1,12 @@
 import type { GetServerSideProps } from "next";
 import Link from "next/link";
-import { Container, Stack, Typography, Button, Card, CardContent } from "@mui/material";
+import { useRouter } from "next/router";
+import { Container, Stack, Typography, Button, Card, CardContent, Box } from "@mui/material";
 import { createApolloClient } from "@/lib/apollo";
 import { ARTICLE } from "@/graphql/queries";
+// Delete and mtation imports
+import { DELETE_ARTICLE } from "@/graphql/mutations";
+import { useMutation } from "@apollo/client/react";
 
 type Article = {
   id: string;
@@ -20,7 +24,37 @@ type ArticleQueryVars = {
   id: string;
 };
 
+type DeleteArticleResult = {
+  deleteArticle: boolean;
+};
+
+type DeleteArticleVars = {
+  id?: string;
+};
+
 export default function ArticlePage({ article }: { article: Article | null }) {
+  const router = useRouter();
+
+  const formatDate = (v?: string | null) => {
+    if (!v) return "";
+    const n = Number(v);
+    return Number.isFinite(n) ? new Date(n).toLocaleString() : v;
+  };
+
+  const [deleteArticle, { loading: deleting }] = useMutation<
+    DeleteArticleResult,
+    DeleteArticleVars
+  >(DELETE_ARTICLE, {
+    refetchQueries: ["Articles"]
+  });
+
+  const onDelete = async () => {
+    if (!window.confirm("Delete this article?")) return;
+
+    await deleteArticle({ variables: { id: article?.id } });
+    await router.push("/");
+  };
+
   if (!article) {
     return (
       <Container maxWidth="md" sx={{ py: 5 }}>
@@ -34,12 +68,6 @@ export default function ArticlePage({ article }: { article: Article | null }) {
     );
   }
 
-  const formatDate = (v?: string | null) => {
-    if (!v) return "";
-    const n = Number(v);
-    return Number.isFinite(n) ? new Date(n).toLocaleString() : v;
-  };
-
   return (
     <Container maxWidth="md" sx={{ py: 5 }}>
       <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={2}>
@@ -51,9 +79,15 @@ export default function ArticlePage({ article }: { article: Article | null }) {
           <Button component={Link} href={`/article/${article.id}/edit`} variant="contained">
             Edit
           </Button>
-          {/* Delete and mutation*/}
-          <Button component={Link} href={`/`} color="error" variant="outlined">
-            Delete (soon)
+          <Button
+            component={Link}
+            href={`/`}
+            color="error"
+            variant="outlined"
+            onClick={onDelete}
+            disabled={deleting}
+          >
+            Delete
           </Button>
         </Stack>
       </Stack>
@@ -67,19 +101,19 @@ export default function ArticlePage({ article }: { article: Article | null }) {
       </Typography>
 
       {article.imageUrl && (
-        <Card variant="outlined" sx={{ mt: 3, overflow: "hidden" }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={article.imageUrl}
-            alt={article.title}
-            style={{ width: "100%", maxHeight: 420, objectFit: "cover", display: "block" }}
-          />
-        </Card>
+        <Box
+          component="img"
+          src={article.imageUrl}
+          alt={article.title}
+          sx={{ maxWidth: "100%", borderRadius: 2 }}
+        />
       )}
 
       <Card variant="outlined" sx={{ mt: 3 }}>
         <CardContent>
-          <Typography sx={{ whiteSpace: "pre-wrap", lineHeight: 1.7 }}>{article.content}</Typography>
+          <Typography sx={{ whiteSpace: "pre-wrap", lineHeight: 1.7 }}>
+            {article.content}
+          </Typography>
         </CardContent>
       </Card>
     </Container>
@@ -91,10 +125,9 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const client = createApolloClient();
 
   const { data } = await client.query<ArticleQueryData, ArticleQueryVars>({
-  query: ARTICLE,
-  variables: { id }
-});
-
+    query: ARTICLE,
+    variables: { id }
+  });
 
   return { props: { article: data?.article ?? null } };
 };

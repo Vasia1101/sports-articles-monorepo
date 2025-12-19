@@ -2,9 +2,16 @@
   "name": "sports-articles-monorepo",
   "private": true,
   "packageManager": "pnpm@9.15.0",
-  "workspaces": ["apps/*", "packages/*"],
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "lint": "pnpm -r lint",
-    "format": "pnpm -r format"
+    "format": "pnpm -r format",
+    "dev": "pnpm -r dev"
+  },
+  "devDependencies": {
+    "prettier": "^3.7.4"
   }
 }
