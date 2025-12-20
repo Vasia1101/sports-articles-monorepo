@@ -115,21 +115,19 @@ pnpm lint
 ---
 
 ## 📌 Notes
-### Image URLs are optional and not validated beyond basic checks
-### Unsplash demo URLs may return 404 — image rendering is intentionally non-blocking
-### Hooks rules are respected (no conditional hooks)
+- Image URLs are optional and not validated beyond basic checks
+- Unsplash demo URLs may return 404 — image rendering is intentionally non-blocking
+- Hooks rules are respected (no conditional hooks)
 
 ## 🧠 What This Project Demonstrates
-### Real-world GraphQL pagination
-### Apollo cache normalization & merging
-### SSR + client hydration
-### Clean separation of concerns (frontend / backend)
-### Production-style project structure
+- Real-world GraphQL pagination
+- Apollo cache normalization & merging
+- SSR + client hydration
+- Clean separation of concerns (frontend / backend)
+- Production-style project structure
 
 ---
 
 ## 👤 Author
-```text
-Vasyl Haida
-Full-Stack / Frontend Engineer
-```
+### Vasyl Haida
+### Full-Stack / Frontend Engineer
