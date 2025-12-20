@@ -10,21 +10,24 @@ import { resolvers } from "./resolvers";
 async function main() {
   const app = express();
 
-  const allowedOrigins = [process.env.FRONTEND_ORIGIN, "http://localhost:3000"].filter(Boolean);
+  // const allowedOrigins = [process.env.FRONTEND_ORIGIN, "http://localhost:3000"].filter(Boolean);
 
-  app.use(
-    cors({
-      origin: (origin, cb) => {
-        // requests without Origin (curl, server-to-server)
-        if (!origin) return cb(null, true);
+  // app.use(
+  //   cors({
+  //     origin: (origin, cb) => {
+  //       // requests without Origin (curl, server-to-server)
+  //       if (!origin) return cb(null, true);
 
-        if (allowedOrigins.includes(origin)) return cb(null, true);
+  //       if (allowedOrigins.includes(origin)) return cb(null, true);
 
-        return cb(new Error("Not allowed by CORS"));
-      },
-      credentials: true
-    })
-  );
+  //       return cb(new Error("Not allowed by CORS"));
+  //     },
+  //     credentials: true
+  //   })
+  // );
+
+  app.use(cors({ origin: true }));
+
 
   app.use(express.json());
 
