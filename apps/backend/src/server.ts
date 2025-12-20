@@ -10,22 +10,22 @@ import { resolvers } from "./resolvers";
 async function main() {
   const app = express();
 
-  const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN ?? "http://localhost:3000";
+  const allowedOrigins = [process.env.FRONTEND_ORIGIN, "http://localhost:3000"].filter(Boolean);
 
   app.use(
     cors({
-      origin: (origin, callback) => {
-        if (!origin) return callback(null, true);
+      origin: (origin, cb) => {
+        // requests without Origin (curl, server-to-server)
+        if (!origin) return cb(null, true);
 
-        if (origin === FRONTEND_ORIGIN) {
-          return callback(null, true);
-        }
+        if (allowedOrigins.includes(origin)) return cb(null, true);
 
-        return callback(new Error("Not allowed by CORS"));
+        return cb(new Error("Not allowed by CORS"));
       },
       credentials: true
     })
   );
+
   app.use(express.json());
 
   const server = new ApolloServer({ typeDefs, resolvers });
