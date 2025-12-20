@@ -54,6 +54,7 @@ sports-articles-monorepo/
 ├─ package.json
 ├─ pnpm-workspace.yaml
 └─ README.md
+```
 
 ---
 
@@ -64,10 +65,12 @@ sports-articles-monorepo/
 ```env
 DATABASE_URL=postgresql://user:password@localhost:5432/sports_articles
 PORT=4000
+```
 
 ### Frontend (apps/frontend/.env.local)
 ```env
 NEXT_PUBLIC_GRAPHQL_URL=http://localhost:4000/graphql
+```
 
 ---
 
@@ -76,20 +79,24 @@ NEXT_PUBLIC_GRAPHQL_URL=http://localhost:4000/graphql
 ### 1️⃣ Install dependencies
 ```bash
 pnpm install
+```
 
 ### 2️⃣ Setup database
 ```text
 cd apps/backend
+```
 ```bash
 pnpm prisma migrate dev
 pnpm prisma db seed
+```
 ### 3️⃣ Run the project
 ```bash
 pnpm dev
+```
 ```text
 Frontend → http://localhost:3000
-```text
 GraphQL API → http://localhost:4000/graphql
+```
 
 ---
 
@@ -98,10 +105,12 @@ GraphQL API → http://localhost:4000/graphql
 ### Format code
 ```bash
 pnpm format
+```
 
 ### Lint code
 ```bash
 pnpm lint
+```
 
 ---
 
@@ -123,3 +132,4 @@ pnpm lint
 ```text
 Vasyl Haida
 Full-Stack / Frontend Engineer
+```
