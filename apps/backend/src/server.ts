@@ -12,7 +12,20 @@ async function main() {
 
   const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN ?? "http://localhost:3000";
 
-  app.use(cors({ origin: FRONTEND_ORIGIN, credentials: true }));
+  app.use(
+    cors({
+      origin: (origin, callback) => {
+        if (!origin) return callback(null, true);
+
+        if (origin === FRONTEND_ORIGIN) {
+          return callback(null, true);
+        }
+
+        return callback(new Error("Not allowed by CORS"));
+      },
+      credentials: true
+    })
+  );
   app.use(express.json());
 
   const server = new ApolloServer({ typeDefs, resolvers });
