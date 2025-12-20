@@ -11,6 +11,9 @@
     "lint": "eslint .",
     "format": "prettier -w ."
   },
+  "prisma": {
+    "seed": "tsx src/seed.ts"
+  },
   "dependencies": {
     "@apollo/server": "^5.2.0",
     "@as-integrations/express5": "^1.1.2",

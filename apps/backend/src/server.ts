@@ -20,9 +20,13 @@ async function main() {
 
   app.use("/graphql", expressMiddleware(server));
 
-  const port = Number(process.env.PORT ?? 4000);
-  app.listen(port, () => {
-    console.log(`Backend ready: http://localhost:${port}/graphql`);
+  const PORT = Number(process.env.PORT ?? 4000);
+  const HOST =
+    process.env.NODE_ENV === "production"
+      ? "https://sports-articles-monorepo.onrender.com"
+      : `http://localhost:${PORT}`;
+  app.listen(PORT, () => {
+    console.log(`Backend ready: ${HOST}/graphql`);
   });
 }
 
